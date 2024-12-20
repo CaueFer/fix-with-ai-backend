@@ -17,7 +17,12 @@ def addToHistory(newMessageObject):
 def summarizeWithLllama(text):
     chat_history = []
     
-    prompt = f"Resuma em pt-br o seguinte conteúdo HTML em tópicos e conteudo, para depois eu dizer qual tópico quero melhor explicado:\n\n{text}"
+    prompt = f"""
+    Retorne o conteúdo no formato JSX semântico, utilizando apenas as tags de texto adequadas, como <h1>, <h2>, <h3>, <p>, <ul>, <li>, entre outras, e adicione **somente** as classes do Tailwind CSS para estilização de texto, como `text-sm`, `text-lg`, `md:text-xl`, `text-color`, `margins`, `font-weight`, ou outras classes relacionadas ao estilo do texto, incluindo as variações de tamanho responsivo (como `md:text-lg`, `lg:text-xl`, etc.). Não adicione explicações, descrição do formato ou links `<a>`. O conteúdo deve ser um resumo em português dos tópicos mais importantes do seguinte texto. Ao final, aguarde minha solicitação para explicar algum tópico específico.
+
+    Conteúdo:
+    {text}
+    """
     
     try:
         # Adiciona a mensagem do usuário ao histórico
