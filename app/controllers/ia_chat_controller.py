@@ -17,7 +17,7 @@ def addToHistory(newMessageObject):
 def summarizeWithLllama(text):
     chat_history = []
     
-    prompt = f"Resuma em pt-br o seguinte conteúdo HTML em tópicos e um leve resumo do tópico, para depois eu dizer qual tópico quero melhor explicado:\n\n{text}"
+    prompt = f"Resuma em pt-br o seguinte conteúdo HTML em tópicos e conteudo, para depois eu dizer qual tópico quero melhor explicado:\n\n{text}"
     
     try:
         # Adiciona a mensagem do usuário ao histórico
@@ -55,7 +55,6 @@ def extractHtmlContent(url):
    
 def resume(): 
     urlToResume = request.json.get('url');
-    print(urlToResume)
     
     if not urlToResume:
         return jsonify({"error": "URL VAZIA"}), 400
