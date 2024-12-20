@@ -9,16 +9,15 @@ chat_history = []
 max_chat_history_size = 5
 
 def addToHistory(newMessageObject):
-    if len(chat_history) >= max_chat_history_size:
-         
+    if len(chat_history) >= max_chat_history_size: 
         chat_history.pop(1)
         chat_history.append(newMessageObject)
-
+    else:   chat_history.append(newMessageObject)
 
 def summarizeWithLllama(text):
     chat_history = []
     
-    prompt = f"Resuma o seguinte conteúdo HTML em tópicos e um leve resumo do tópico, para depois eu dizer qual tópico quero melhor explicado:\n\n{text}"
+    prompt = f"Resuma em pt-br o seguinte conteúdo HTML em tópicos e um leve resumo do tópico, para depois eu dizer qual tópico quero melhor explicado:\n\n{text}"
     
     try:
         # Adiciona a mensagem do usuário ao histórico
@@ -34,8 +33,8 @@ def summarizeWithLllama(text):
                 finalResponse += content
                 yield content  
         
-        # Adiciona a resposta do modelo ao histórico
-        chat_history.append({"role": "assistant", "content": finalResponse})
+        # ADD MESSAGE TO CHAT HISTORY
+        addToHistory({"role": "assistant", "content": finalResponse})
         
         
     except Exception as e:
@@ -56,6 +55,7 @@ def extractHtmlContent(url):
    
 def resume(): 
     urlToResume = request.json.get('url');
+    print(urlToResume)
     
     if not urlToResume:
         return jsonify({"error": "URL VAZIA"}), 400
@@ -84,22 +84,24 @@ def resume():
   
    
 def questionToAI():
-    print(chat_history)
     try:
-        response = ollama.chat(model="llama3.1", messages=chat_history)
+        print('IA Pensando...')
+        response = ollama.chat(model="llama3.1", messages=chat_history, stream=True)
         
         finalResponse = ''
         
         for chunk in response:
-            print(chunk) 
-            if isinstance(chunk, tuple) and len(chunk) == 2 and chunk[0] == 'message':
-                message = chunk[1] 
-                if hasattr(message, 'content'): 
-                    content = message.content 
-                    yield content
+            if 'message' in chunk and 'content' in chunk['message']:
+                content = chunk['message']['content']
+                finalResponse += content
+                yield content 
         
-        # ADD RESPONSE TO CHAT HISTORY
-        addToHistory({"role": "assistant", "content": finalResponse})
+        
+        if(len(finalResponse) > 1 ):
+            print('Formatando resposta...')
+            
+            # ADD RESPONSE TO CHAT HISTORY
+            addToHistory({"role": "assistant", "content": finalResponse})
         
     except Exception as e:
         error_message = f"Erro ao processar a resposta: {e}"
